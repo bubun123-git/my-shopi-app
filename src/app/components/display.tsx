@@ -73,10 +73,13 @@ export default function Display({ addToCart }: DisplayProps) {
   return (
     <div className="py-6 text-center">
       <div className="mb-4">
-  <Link href="/" className="text-gray-800 hover:text-primary transition-colors">
-    Home
-  </Link>
-</div>
+        <Link
+          href="/"
+          className="text-gray-800 hover:text-primary transition-colors"
+        >
+          Home
+        </Link>
+      </div>
       <div className="max-w-md mx-auto px-4 mb-8 relative">
         <input
           type="text"
