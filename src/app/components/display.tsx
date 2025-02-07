@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Search, ChevronDown, Star } from "lucide-react"
+import ProductSkeleton from "./product-skeleton"
 
 interface Product {
   id: number
@@ -22,22 +23,23 @@ interface DisplayProps {
 export default function Display({ addToCart }: DisplayProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [searchTerm, setSearchTerm] = useState("")
-  const [isClient, setIsClient] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [sortBy, setSortBy] = useState("name")
   const [filterCategory, setFilterCategory] = useState("all")
 
   useEffect(() => {
-    setIsClient(true)
+    setIsLoading(true)
+    fetch("https://api.escuelajs.co/api/v1/products")
+      .then((response) => response.json())
+      .then((data: Product[]) => {
+        setProducts(data)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error)
+        setIsLoading(false)
+      })
   }, [])
-
-  useEffect(() => {
-    if (isClient) {
-      fetch("https://api.escuelajs.co/api/v1/products")
-        .then((response) => response.json())
-        .then((data: Product[]) => setProducts(data))
-        .catch((error) => console.error("Error fetching products:", error))
-    }
-  }, [isClient])
 
   const getImageUrl = (images: string[]): string => {
     if (!images || images.length === 0) return "/placeholder.svg"
@@ -64,10 +66,6 @@ export default function Display({ addToCart }: DisplayProps) {
     })
 
   const categories = ["all", ...new Set(products.map((product) => product.category.name))]
-
-  if (!isClient) {
-    return <div>Loading...</div>
-  }
 
   return (
     <div className="py-6 text-center">
@@ -115,37 +113,40 @@ export default function Display({ addToCart }: DisplayProps) {
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto px-4">
-        {filteredAndSortedProducts.map((product) => (
-          <div
-            key={product.id}
-            className="border rounded-lg p-4 flex flex-col transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg hover:z-10 bg-white"
-          >
-            <div className="relative w-full h-48 mb-4 overflow-hidden rounded">
-              <Image
-                src={getImageUrl(product.images) || "/placeholder.svg"}
-                alt={product.title}
-                layout="fill"
-                objectFit="cover"
-                className="transition-transform duration-300 ease-in-out transform hover:scale-110"
-              />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
-            <p className="text-gray-600 mb-2 flex-grow">{product.description}</p>
-            <div className="flex justify-between items-center mb-2">
-              <p className="text-primary font-bold">${product.price}</p>
-              <div className="flex items-center">
-                <Star className="text-yellow-400 w-4 h-4 mr-1" />
-                <span className="text-sm text-gray-600">{(Math.random() * (5 - 3) + 3).toFixed(1)}</span>
+        {isLoading
+          ? // Show skeleton loaders while loading
+            Array.from({ length: 8 }).map((_, index) => <ProductSkeleton key={index} />)
+          : filteredAndSortedProducts.map((product) => (
+              <div
+                key={product.id}
+                className="border rounded-lg p-4 flex flex-col transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg hover:z-10 bg-white"
+              >
+                <div className="relative w-full h-48 mb-4 overflow-hidden rounded">
+                  <Image
+                    src={getImageUrl(product.images) || "/placeholder.svg"}
+                    alt={product.title}
+                    layout="fill"
+                    objectFit="cover"
+                    className="transition-transform duration-300 ease-in-out transform hover:scale-110"
+                  />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
+                <p className="text-gray-600 mb-2 flex-grow">{product.description}</p>
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-primary font-bold">${product.price}</p>
+                  <div className="flex items-center">
+                    <Star className="text-yellow-400 w-4 h-4 mr-1" />
+                    <span className="text-sm text-gray-600">{(Math.random() * (5 - 3) + 3).toFixed(1)}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => addToCart(product)}
+                  className="bg-black text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors duration-300"
+                >
+                  Add to Cart
+                </button>
               </div>
-            </div>
-            <button
-              onClick={() => addToCart(product)}
-              className="bg-black text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors duration-300"
-            >
-              Add to Cart
-            </button>
-          </div>
-        ))}
+            ))}
       </div>
     </div>
   )

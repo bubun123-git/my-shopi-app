@@ -32,6 +32,15 @@ const config: Config = {
           '2xl': "100%", // Set full width for larger screens as well
         },
       },
+      animation: {
+        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite", // Add pulse animation
+      },
+      keyframes: {
+        pulse: {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.5" },
+        },
+      },
     },
   },
   plugins: [],
