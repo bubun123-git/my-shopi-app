@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff; /* Default background is white */
+  --foreground: #171717; /* Default foreground color (dark text) */
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background); /* Directly use the variable */
+  font-family: Arial, Helvetica, sans-serif;
+}
