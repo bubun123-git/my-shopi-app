@@ -1,78 +1,83 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import { Search, ChevronDown, Star } from "lucide-react"
-import ProductSkeleton from "./product-skeleton"
+"use client";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Search, ChevronDown, Star } from "lucide-react";
+import ProductSkeleton from "./product-skeleton";
 
 interface Product {
-  id: number
-  title: string
-  price: number
-  description: string
-  images: string[]
+  id: number;
+  title: string;
+  price: number;
+  description: string;
+  images: string[];
   category: {
-    name: string
-  }
+    name: string;
+  };
 }
 
 interface DisplayProps {
-  addToCart: (product: Product) => void
+  addToCart: (product: Product) => void;
 }
 
 export default function Display({ addToCart }: DisplayProps) {
-  const [products, setProducts] = useState<Product[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-  const [sortBy, setSortBy] = useState("name")
-  const [filterCategory, setFilterCategory] = useState("all")
+  const [products, setProducts] = useState<Product[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [sortBy, setSortBy] = useState("name");
+  const [filterCategory, setFilterCategory] = useState("all");
 
   useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     fetch("https://api.escuelajs.co/api/v1/products")
       .then((response) => response.json())
       .then((data: Product[]) => {
-        setProducts(data)
-        setIsLoading(false)
+        setProducts(data);
+        setIsLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching products:", error)
-        setIsLoading(false)
-      })
-  }, [])
+        console.error("Error fetching products:", error);
+        setIsLoading(false);
+      });
+  }, []);
 
   const getImageUrl = (images: string[]): string => {
-    if (!images || images.length === 0) return "/placeholder.svg"
+    if (!images || images.length === 0) return "/placeholder.svg";
 
-    const firstImage = images[0]
+    const firstImage = images[0];
     if (typeof firstImage === "string") {
-      return firstImage.startsWith("http") ? firstImage : `/${firstImage}`
+      return firstImage.startsWith("http") ? firstImage : `/${firstImage}`;
     }
 
-    return "/placeholder.svg"
-  }
+    return "/placeholder.svg";
+  };
 
   const filteredAndSortedProducts = products
     .filter(
       (product) =>
         product.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (filterCategory === "all" || product.category.name === filterCategory),
+        (filterCategory === "all" || product.category.name === filterCategory)
     )
     .sort((a, b) => {
-      if (sortBy === "name") return a.title.localeCompare(b.title)
-      if (sortBy === "price-low") return a.price - b.price
-      if (sortBy === "price-high") return b.price - a.price
-      return 0
-    })
+      if (sortBy === "name") return a.title.localeCompare(b.title);
+      if (sortBy === "price-low") return a.price - b.price;
+      if (sortBy === "price-high") return b.price - a.price;
+      return 0;
+    });
 
-  const categories = ["all", ...new Set(products.map((product) => product.category.name))]
+  const categories = [
+    "all",
+    ...new Set(products.map((product) => product.category.name)),
+  ];
 
   return (
     <div className="py-6 text-center">
       <div className="mb-4">
-        <a href="/" className="text-gray-800 hover:text-primary transition-colors">
-          Home
-        </a>
+        <Link href="/" passHref>
+          <a className="text-gray-800 hover:text-primary transition-colors">
+            Home
+          </a>
+        </Link>
       </div>
       <div className="max-w-md mx-auto px-4 mb-8 relative">
         <input
@@ -115,7 +120,9 @@ export default function Display({ addToCart }: DisplayProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto px-4">
         {isLoading
           ? // Show skeleton loaders while loading
-            Array.from({ length: 8 }).map((_, index) => <ProductSkeleton key={index} />)
+            Array.from({ length: 8 }).map((_, index) => (
+              <ProductSkeleton key={index} />
+            ))
           : filteredAndSortedProducts.map((product) => (
               <div
                 key={product.id}
@@ -131,12 +138,16 @@ export default function Display({ addToCart }: DisplayProps) {
                   />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
-                <p className="text-gray-600 mb-2 flex-grow">{product.description}</p>
+                <p className="text-gray-600 mb-2 flex-grow">
+                  {product.description}
+                </p>
                 <div className="flex justify-between items-center mb-2">
                   <p className="text-primary font-bold">${product.price}</p>
                   <div className="flex items-center">
                     <Star className="text-yellow-400 w-4 h-4 mr-1" />
-                    <span className="text-sm text-gray-600">{(Math.random() * (5 - 3) + 3).toFixed(1)}</span>
+                    <span className="text-sm text-gray-600">
+                      {(Math.random() * (5 - 3) + 3).toFixed(1)}
+                    </span>
                   </div>
                 </div>
                 <button
@@ -149,6 +160,5 @@ export default function Display({ addToCart }: DisplayProps) {
             ))}
       </div>
     </div>
-  )
+  );
 }
-
