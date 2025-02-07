@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { initializeApp, getApps } from "firebase/app"
 import { getAuth } from "firebase/auth"
 
@@ -10,7 +11,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
 
-// Initialize Firebase
 let app
 if (!getApps().length) {
   app = initializeApp(firebaseConfig)
@@ -20,3 +20,13 @@ if (!getApps().length) {
 
 export const auth = getAuth(app)
 
+// To initialize firebase only after the page is loaded
+export default function FirebaseApp() {
+  useEffect(() => {
+    if (!getApps().length) {
+      initializeApp(firebaseConfig)
+    }
+  }, [])
+  
+  return null // or return any relevant JSX
+}
