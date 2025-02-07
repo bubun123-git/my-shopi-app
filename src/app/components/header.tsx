@@ -1,8 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { ShoppingCart } from "lucide-react"
+import { ShoppingCart, LogOut } from "lucide-react"
 import { useState } from "react"
+import { useAuth } from "../../../hooks/useAuth"
+import { signOut } from "firebase/auth"
+import { auth } from "../../../lib/firebase"
+import { Button } from "../components/ui/button"
 
 interface NavItem {
   label: string
@@ -29,7 +33,16 @@ export default function Header({ cartItems, onCartClick }: HeaderProps) {
     { label: "Toys", href: "/toys" },
   ])
 
+  const { user } = useAuth()
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth)
+    } catch (error) {
+      console.error("Failed to log out", error)
+    }
+  }
 
   return (
     <header className="border-b border-gray-200">
@@ -58,19 +71,42 @@ export default function Header({ cartItems, onCartClick }: HeaderProps) {
           </div>
 
           <div className="flex items-center space-x-6 flex-wrap">
-            <span className="text-sm text-gray-600 whitespace-nowrap">userintheapp@test.com</span>
-            <Link
-              href="/orders"
-              className="text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap"
-            >
-              My Orders
-            </Link>
-            <Link
-              href="/account"
-              className="text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap"
-            >
-              My Account
-            </Link>
+            {user ? (
+              <>
+                <span className="text-sm text-gray-600 whitespace-nowrap">{user.email}</span>
+                <Link
+                  href="/orders"
+                  className="text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap"
+                >
+                  My Orders
+                </Link>
+                <Link
+                  href="/account"
+                  className="text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap"
+                >
+                  My Account
+                </Link>
+                <Button onClick={handleLogout} variant="ghost" size="sm">
+                  <LogOut className="h-5 w-5 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  className="text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
             <button onClick={onCartClick} className="flex items-center space-x-1 hover:text-primary transition-colors">
               <ShoppingCart className="h-5 w-5" />
               <span className="text-sm">{cartItemCount}</span>
