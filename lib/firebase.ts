@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -13,22 +13,20 @@ const firebaseConfig = {
 
 let app;
 
-// Initialize Firebase only on the client-side
-if (typeof window !== "undefined" && !getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApps()[0] || null; // Fallback if needed
-}
+export const auth = getAuth(); // Initialize auth outside of the useEffect
 
-export const auth = typeof window !== "undefined" ? getAuth(app) : null;
-
-// Client-side component to handle initialization
+// Client-side component to handle Firebase initialization
 export default function FirebaseApp() {
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
     if (typeof window !== "undefined" && !getApps().length) {
-      initializeApp(firebaseConfig);
+      app = initializeApp(firebaseConfig);
     }
+    setIsClient(true); // Set state to confirm it's running on the client side
   }, []);
+
+  if (!isClient) return null; // Return nothing while on the server side
 
   return null;
 }
