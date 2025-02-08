@@ -37,10 +37,14 @@ export default function Header({ cartItems, onCartClick }: HeaderProps) {
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   const handleLogout = async () => {
-    try {
-      await signOut(auth)
-    } catch (error) {
-      console.error("Failed to log out", error)
+    if (auth) {
+      try {
+        await signOut(auth)
+      } catch (error) {
+        console.error("Failed to log out", error)
+      }
+    } else {
+      console.error("Firebase auth is not initialized.")
     }
   }
 
@@ -117,4 +121,3 @@ export default function Header({ cartItems, onCartClick }: HeaderProps) {
     </header>
   )
 }
-
