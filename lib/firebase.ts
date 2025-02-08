@@ -12,8 +12,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let app;
-
 export const auth = typeof window !== "undefined" ? getAuth() : null;
 
 // Initialize Firebase client-side only
@@ -24,7 +22,7 @@ export default function FirebaseApp() {
     if (typeof window !== "undefined") {
       // Initialize Firebase only in the browser
       if (!getApps().length) {
-        app = initializeApp(firebaseConfig);
+        initializeApp(firebaseConfig); // We no longer need to assign to `app`
       }
       setIsClient(true);
     }
