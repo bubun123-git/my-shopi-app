@@ -14,7 +14,11 @@ export default function SignupForm() {
     e.preventDefault()
     setError("")
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
+      if (auth) {
+        await createUserWithEmailAndPassword(auth, email, password)
+      } else {
+        setError("Authentication failed. Please try again later.")
+      }
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message)
@@ -58,4 +62,3 @@ export default function SignupForm() {
     </form>
   )
 }
-
