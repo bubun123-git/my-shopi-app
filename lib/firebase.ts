@@ -20,7 +20,7 @@ if (typeof window !== "undefined" && !getApps().length) {
   app = getApps()[0] || null; // Fallback if needed
 }
 
-export const auth = typeof window !== "undefined" ? getAuth(app) : null;
+export const auth = typeof window !== "undefined" && app ? getAuth(app) : null;
 
 // Client-side component to handle initialization
 export default function FirebaseApp() {
